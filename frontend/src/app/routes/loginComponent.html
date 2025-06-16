@@ -1,0 +1,43 @@
+<div style="text-align: center; margin-top: 40px;">
+    <h2>Login</h2>
+    <div *ngIf="invalidInfo.length > 0">
+        <ul style="
+        list-style-type: none;
+        color: red;
+        font-weight: bold;
+        background-color: #f8d7da;
+        border-radius: 5px;
+        padding: 10px;
+        width: 800px;
+        margin: 0 auto;
+        text-align: center;
+    ">
+            <div *ngFor="let message of invalidInfo">
+                <li>{{ message }}</li>
+            </div>
+        </ul>
+        <br>
+    </div>
+    <form #loginForm="ngForm" (ngSubmit)="onSubmit(loginForm)">
+        <mat-form-field appearance="fill" class="w-full" style="width: 600px;">
+            <mat-label>Email</mat-label>
+            <input matInput type="email" id="email" name="email" [(ngModel)]="email" required email
+                #emailInput="ngModel" />
+        </mat-form-field>
+        <div *ngIf="emailInput.invalid && emailInput.touched" class="error">
+            Valid email is required.
+        </div><br>
+
+        <mat-form-field appearance="fill" class="w-full" style="width: 600px;">
+            <mat-label>Password</mat-label>
+            <input matInput type="password" id="password" name="password" [(ngModel)]="password" required minlength="6"
+                #passwordInput="ngModel" />
+        </mat-form-field>
+        <div *ngIf="passwordInput.invalid && passwordInput.touched" class="error">
+            Password must be at least 6 characters.
+        </div><br>
+
+        <button mat-raised-button type="submit" [disabled]="loginForm.invalid">Submit</button><br>
+        <a href="/signup" style="color: rgb(144, 144, 236);" mat-raised-button>Don't have an account? Sign Up</a>
+    </form>
+</div>

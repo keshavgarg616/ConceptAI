@@ -1,0 +1,56 @@
+<div *ngIf="historyDeleted" style="
+        color: greenyellow;
+        font-weight: bold;
+        background-color: green;
+        border-radius: 5px;
+        padding: 10px;
+        width: 800px;
+        margin: 0 auto;
+        text-align: center;
+    ">
+    History deleted successfully!
+    <br>
+</div>
+<div style="color: white; float: right; vertical-align: top; margin-right: 20px;">
+    <a href="/logout" style="color: red;"><button mat-raised-button type="submit">Logout</button></a><br>
+    <form (ngSubmit)="deleteHistory()"><button mat-raised-button type="submit" style="color: red;">Delete
+            History</button>
+    </form>
+    <a href="/languages" style="color: violet;"><button mat-raised-button>Go Back</button></a><br>
+</div>
+<div class="chat-container">
+    <div style="
+        color: #E0F7FA;
+        font-weight: bold;
+        background-color: #263238;
+        border-radius: 5px;
+        padding: 10px;
+        width: max-content;
+        margin: 0 auto;
+        margin-bottom: 8px;
+        text-align: center;
+    ">
+        {{ languageName}} - {{conceptName}}
+        <br>
+    </div>
+    <div class="chat-box">
+        <div *ngFor="let message of history">
+            <div [style]="message.role === 'user' ? 'text-align: right;' : ''">
+                <div [ngClass]="message.role === 'user' ? 'user' : 'bot'">
+                    {{ message.parts[0].text }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form [formGroup]="chatForm" (ngSubmit)="handleSubmit()">
+        <mat-form-field appearance="fill" class="w-full" style="width: 600px; max-height: fit-content;">
+            <mat-label>Ask something</mat-label>
+            <input matInput type="text" formControlName="query">
+        </mat-form-field>
+        <div *ngIf="loadingResponse" class="loading-bubble">
+            <span>.</span><span>.</span><span>.</span>
+        </div>
+        <button type="submit" [disabled]="chatForm.invalid||loadingResponse" hidden></button>
+    </form>
+</div>

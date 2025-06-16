@@ -1,0 +1,70 @@
+<div style="
+        color: #57bcc7;
+        font-weight: bold;
+        background-color: #2a4755;
+        border-radius: 15px;
+        padding: 5px;
+        max-width: 800px;
+        margin: 40px auto 20px auto;
+        text-align: center;
+    ">
+    <h2>Add Programming Languages if needed and click Submit</h2>
+</div>
+
+<div style="color: white; float: right; margin: 0px 0px 20px 0;">
+    <a href="/logout"><button mat-raised-button color="warn" type="button" style="color:red">Logout</button></a><br>
+</div>
+
+<div style="max-width: 700px; margin: 0 auto; text-align: left;">
+    <form [formGroup]="languagesForm" (ngSubmit)="onSubmit()">
+        <div formArrayName="languages">
+            <div *ngFor="let language of getLanguages().controls; let i = index" [formGroupName]="i">
+                <div style="background-color: #263238; border-radius: 20px; padding: 0px 0px 10px 10px;">
+                    <div style="margin-top: 20px"></div>
+
+                    <mat-form-field appearance="fill" style="width: 80%;">
+                        <mat-label>Language Name</mat-label>
+                        <input matInput id="languageName" formControlName="languageName" required>
+                    </mat-form-field>
+
+                    <button mat-button color="warn" type="button" (click)="removeLanguage(i)">🗑</button>
+
+                    <div formArrayName="concepts" style="margin-left: 5%;">
+                        <div style="margin-top: 0px;" *ngIf="getConcepts(language).length !== 0"></div>
+                        <div *ngFor="let concept of getConcepts(language).controls; let j = index" [formGroupName]="j">
+                            <label for="conceptName" (click)="onConceptClicked(i, j)" style="color: blanchedalmond;">
+                                Concept Name:
+                            </label>
+
+                            <mat-form-field appearance="fill" style="width: 70%;">
+                                <input matInput id="conceptName" formControlName="conceptName" required
+                                    style="margin-right: 10px;">
+                            </mat-form-field>
+
+                            <button mat-button color="warn" type="button" (click)="removeConcept(language, j)">
+                                ❌
+                            </button>
+                        </div>
+
+                    </div>
+                    <button mat-button type="button" (click)="addConcept(language)"
+                        style="margin-top: 5px; border: 2px solid #21474d; border-radius: 20px; color: aquamarine;">
+                        Add Concept
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <button mat-button type="button" (click)="addLanguage()"
+            style="margin-top: 25px; border: 2px solid #5bb3c0; border-radius: 20px; color: rgb(176, 204, 195);">
+            Add Language
+        </button>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <button mat-raised-button color="primary" type="submit" [disabled]="languagesForm.invalid"
+                style="border: 2px solid #3968eb; border-radius: 20px; color: #b5bdd8;">
+                Submit
+            </button>
+        </div>
+    </form>
+</div>
