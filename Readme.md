@@ -102,5 +102,5 @@ JWT_SECRET=your_jwt_encryption_key
 
 ## 🧠 Contributors
 
-Built with ❤️ by **Keshav Garg**
+Built with ❤️ by **Keshav Garg**  
 Based on **EssayHelper**, by me :D
