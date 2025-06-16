@@ -6,13 +6,13 @@ Whether you're learning Python, JavaScript, Java, or any other language, Concept
 
 ---
 
-![Login Screen](image-2.png)
+![Login Screen](Screenshots/image-2.png)
 
-![Sign Up Screen](image-3.png)
+![Sign Up Screen](Screenshots/image-3.png)
 
-![Concepts Screen](image.png)
+![Concepts Screen](Screenshots/image.png)
 
-![Chat Screen](image-1.png)
+![Chat Screen](Screenshots/image-1.png)
 
 ---
 
