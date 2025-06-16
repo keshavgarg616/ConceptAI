@@ -12,27 +12,8 @@ Whether you're learning Python, JavaScript, Java, or any other language, Concept
 -   🌍 **Multi-language Support**: Add multiple programming languages and concepts under each.
 -   🔐 **Secure User Auth**: Encrypted login system with JWT-based session management.
 -   💬 **Persistent History**: Concept-specific conversations stored and restored across sessions.
--   🧰 **Modular Form Management**: Add, remove, and manage concepts and languages dynamically with Angular Reactive Forms.
+-   🧰 **Modular Form Management**: Add, remove, and manage concepts and languages dynamically.
 -   ⚙️ **Seamless Full-Stack Architecture**: Decoupled frontend and backend for scalability.
-
----
-
-## 🏗 Architectural Overview
-
--   🧱 **Modular Backend (Node.js + Express)**
-
-    -   REST API structure with controllers, routes, and middleware.
-    -   Gemini API calls secured in the backend (API key never exposed to frontend).
-
--   🛡 **Authentication**
-
-    -   Email/password stored securely using SHA256 + bcrypt.
-    -   JWT-based stateless session handling.
-    -   Protected routes + Angular route guards.
-
--   🌀 **Frontend (Angular + Angular Material)**
-    -   Multi-page flow: Login, Signup, Language/Concept Editor, Chat.
-    -   Form validation, route navigation, and conditional rendering built-in.
 
 ---
 
