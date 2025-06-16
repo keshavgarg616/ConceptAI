@@ -22,18 +22,19 @@
                 <div style="background-color: #263238; border-radius: 20px; padding: 0px 0px 10px 10px;">
                     <div style="margin-top: 20px"></div>
 
-                    <mat-form-field appearance="fill" style="width: 80%;">
+                    <mat-form-field appearance="fill" style="width: 82%;">
                         <mat-label>Language Name</mat-label>
                         <input matInput id="languageName" formControlName="languageName" required>
                     </mat-form-field>
 
-                    <button mat-button color="warn" type="button" (click)="removeLanguage(i)">🗑</button>
+                    <button mat-button color="warn" type="button" (click)="removeLanguage(i)"
+                        title="Remove Language">🗑</button>
 
                     <div formArrayName="concepts" style="margin-left: 5%;">
                         <div style="margin-top: 0px;" *ngIf="getConcepts(language).length !== 0"></div>
                         <div *ngFor="let concept of getConcepts(language).controls; let j = index" [formGroupName]="j">
-                            <label for="conceptName" (click)="onConceptClicked(i, j)" style="color: blanchedalmond;">
-                                Concept Name:
+                            <label for="conceptName" style="color: blanchedalmond;">
+                                Concept {{ j + 1 }}:
                             </label>
 
                             <mat-form-field appearance="fill" style="width: 70%;">
@@ -41,8 +42,13 @@
                                     style="margin-right: 10px;">
                             </mat-form-field>
 
-                            <button mat-button color="warn" type="button" (click)="removeConcept(language, j)">
+                            <button mat-button color="warn" type="button" (click)="removeConcept(language, j)"
+                                style="max-width: max-content; margin-right: -20px;" title="Remove Concept">
                                 ❌
+                            </button>
+                            <button mat-button color="warn" type="button" (click)="onConceptClicked(i, j)"
+                                style="max-width: max-content; margin-left: 0px;" title="Chat">
+                                💬
                             </button>
                         </div>
 
