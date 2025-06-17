@@ -31,7 +31,7 @@ frontend/.vscode/*
 !frontend/.vscode/extensions.json
 frontend/.history/*
 frontend/.editorconfig
-frontend/src/environments/*
+frontend/src/environments/environment.ts
 
 # Miscellaneous
 frontend/.angular/cache
