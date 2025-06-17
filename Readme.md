@@ -33,6 +33,8 @@ Whether you're learning Python, JavaScript, Java, or any other language, Concept
 ConceptAI/
 ├── frontend/             # Angular application
 │   └── src/
+│       ├── environments
+│           └── environment.ts
 │       └── app/
 │           └── routes/
 ├── backend/              # Node.js + Express server
@@ -70,13 +72,30 @@ npm start
 Create a `.env` file in the `backend/` directory with:
 
 ```env
-GENAI_API_KEY=your_google_gemini_api_key
+GEMINI_API_KEY=your_google_gemini_api_key
 MongoDBUsername=your_mongodb_atlas_username
 MongoDBPswd=your_mongodb_atlas_password
 MongoDBClusterString=your_mongodb_cluster_string
 SALT_WORK_FACTOR=your_salt_work_factor_for_bcrypt
 EMAIL_HASH_SECRET=your_sha256_secret_key
+ENCRYPTION_ALGORITHM=your_encryption_algorithm_for_auth_code
+ENCRYPTION_KEY=your_32_bit_key_for_encrypting_auth_code
+ENCRYPTION_IV=your_16_bit_IV_for_encrypting_auth_code
 JWT_SECRET=your_jwt_encryption_key
+EMAIL_USER=your_email_username
+EMAIL_PASS=your_email_password
+EMAIL_NAME=your_name
+EMAIL_SMTP_HOST=your_smtp_host
+EMAIL_SMTP_PORT=your_smtp_port
+FRONTEND_URL=your_frontend_url
+```
+
+Create `environments/environment.ts` file in the `frontend/src/` directory with:
+
+```env
+export const environment = {
+	apiUrl: your_backend_api_url,
+};
 ```
 
 ---

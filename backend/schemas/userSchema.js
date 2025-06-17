@@ -36,6 +36,10 @@ const userSchema = new mongoose.Schema({
 		type: String,
 		required: true, // used for email verification
 	},
+	authCodeCreatedAt: {
+		type: Date,
+		default: Date.now, // timestamp for when the auth code was created
+	},
 	isVerified: {
 		type: Boolean,
 		default: false, // indicates if the email is verified

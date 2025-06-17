@@ -39,57 +39,33 @@ export class emailVerificationComponent {
 			console.error("No authentication code provided in the URL.");
 			this.router.navigate(["/login"]);
 		}
-	}
-
-	emailForm = new FormGroup({
-		email: new FormControl("", Validators.required),
-	});
-
-	verify() {
-		if (this.emailForm.valid) {
-			this.invalidInfo = [];
-			const email = this.emailForm.value.email;
-			this.apiService
-				.verifyEmail(email ?? "", this.authCode ?? "")
-				.subscribe({
-					next: (response) => {
-						console.log("Email verification successful", response);
-						this.emailVerified = true;
-						new Promise((r) => setTimeout(r, 1500)).then(() => {
-							this.router.navigate(["/login"]);
-						});
-					},
-					error: (error) => {
-						if (
-							error.error.error.includes("Email already verified")
-						) {
-							console.error("Email has already been verified.");
-							this.invalidInfo.push(
-								"Email has already been verified. Please log in."
-							);
-							new Promise((r) => setTimeout(r, 1500)).then(() => {
-								this.router.navigate(["/login"]);
-							});
-						}
-						console.log(error.error.error);
-						if (error.error.error.includes("User not found")) {
-							console.error(
-								"Email not found. Please enter a valid email."
-							);
-							this.invalidInfo.push(
-								"Email not found. Please enter a valid email."
-							);
-						}
-						if (error.error.error.includes("Invalid auth code")) {
-							console.error("Invalid authentication code.");
-							this.invalidInfo.push(
-								"Invalid authentication code."
-							);
-						}
-					},
+		this.invalidInfo = [];
+		this.apiService.verifyEmail(this.authCode ?? "").subscribe({
+			next: (response) => {
+				console.log("Email verification successful", response);
+				this.emailVerified = true;
+				new Promise((r) => setTimeout(r, 1500)).then(() => {
+					this.router.navigate(["/login"]);
 				});
-		} else {
-			console.error("Email form is invalid");
-		}
+			},
+			error: (error) => {
+				if (error.error.error.includes("Email already verified")) {
+					console.error("Email has already been verified.");
+					this.invalidInfo.push(
+						"Email has already been verified. Please log in."
+					);
+					new Promise((r) => setTimeout(r, 1500)).then(() => {
+						this.router.navigate(["/login"]);
+					});
+				}
+				if (error.error.error.includes("Invalid auth code")) {
+					console.error("Invalid authentication code.");
+					this.invalidInfo.push("Invalid authentication code.");
+					new Promise((r) => setTimeout(r, 1500)).then(() => {
+						this.router.navigate(["/login"]);
+					});
+				}
+			},
+		});
 	}
 }

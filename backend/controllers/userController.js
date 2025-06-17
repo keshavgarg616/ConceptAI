@@ -43,7 +43,19 @@ export const signUp = async (req, res) => {
 			pass: process.env.EMAIL_PASS, // your email password
 		},
 	});
-	const authCode = randomBytes(8).toString("hex");
+
+	const cipher = crypto.createCipheriv(
+		process.env.ENCRYPTION_ALGORITHM,
+		Buffer.from(process.env.ENCRYPTION_KEY, "hex"),
+		Buffer.from(process.env.ENCRYPTION_IV, "hex")
+	);
+	let encrypted = cipher.update(
+		email + " " + randomBytes(16).toString("hex"),
+		"utf8",
+		"hex"
+	);
+	encrypted += cipher.final("hex");
+	const authCode = encrypted;
 
 	try {
 		const existingUser = await findByEmail(email);
@@ -120,7 +132,26 @@ export const login = async (req, res) => {
 };
 
 export const verifyAuthCode = async (req, res) => {
-	const { email, authCode } = req.body;
+	const { authCode } = req.body;
+
+	const decipher = crypto.createDecipheriv(
+		process.env.ENCRYPTION_ALGORITHM,
+		Buffer.from(process.env.ENCRYPTION_KEY, "hex"),
+		Buffer.from(process.env.ENCRYPTION_IV, "hex")
+	);
+	let decrypted = "";
+	try {
+		decrypted = decipher.update(authCode, "hex", "utf8");
+		decrypted += decipher.final("utf8");
+	} catch (error) {
+		console.error("Decryption error");
+		return res.status(400).json({ error: "Invalid auth code" });
+	}
+	const email = decrypted.split(" ")[0];
+	if (!email) {
+		return res.status(400).json({ error: "Invalid auth code" });
+	}
+
 	try {
 		const user = await findByEmail(email);
 		if (user) {
@@ -139,7 +170,7 @@ export const verifyAuthCode = async (req, res) => {
 				return res.status(401).json({ error: "Invalid auth code" });
 			}
 		} else {
-			return res.status(401).json({ error: "User not found" });
+			return res.status(401).json({ error: "Invalid auth code" });
 		}
 	} catch (error) {
 		res.status(500).json({ error: "Internal server error" });
