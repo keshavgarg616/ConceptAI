@@ -91,8 +91,21 @@ export class ApiService {
 	}
 
 	verifyEmail(authCode: string): Observable<any> {
-		return this.http.post(`${this.apiUrl}/verify-authcode`, {
+		return this.http.post(`${this.apiUrl}/verify-email-code`, {
 			authCode,
+		});
+	}
+
+	requestPasswordReset(email: string): Observable<any> {
+		return this.http.post(`${this.apiUrl}/request-password-reset`, {
+			email,
+		});
+	}
+
+	resetPassword(authCode: string, password: string): Observable<any> {
+		return this.http.post(`${this.apiUrl}/reset-password`, {
+			authCode,
+			password,
 		});
 	}
 }

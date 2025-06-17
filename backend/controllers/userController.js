@@ -7,6 +7,7 @@ import bcrypt from "bcrypt";
 import { randomBytes } from "crypto";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
+import { get } from "http";
 
 dotenv.config();
 const genAI = new GoogleGenAI({ apiKey: process.env.GENAI_API_KEY });
@@ -44,18 +45,7 @@ export const signUp = async (req, res) => {
 		},
 	});
 
-	const cipher = crypto.createCipheriv(
-		process.env.ENCRYPTION_ALGORITHM,
-		Buffer.from(process.env.ENCRYPTION_KEY, "hex"),
-		Buffer.from(process.env.ENCRYPTION_IV, "hex")
-	);
-	let encrypted = cipher.update(
-		email + " " + randomBytes(16).toString("hex"),
-		"utf8",
-		"hex"
-	);
-	encrypted += cipher.final("hex");
-	const authCode = encrypted;
+	const authCode = getAuthCode(email);
 
 	try {
 		const existingUser = await findByEmail(email);
@@ -131,24 +121,11 @@ export const login = async (req, res) => {
 	}
 };
 
-export const verifyAuthCode = async (req, res) => {
+export const verifyEmailCode = async (req, res) => {
 	const { authCode } = req.body;
 
-	const decipher = crypto.createDecipheriv(
-		process.env.ENCRYPTION_ALGORITHM,
-		Buffer.from(process.env.ENCRYPTION_KEY, "hex"),
-		Buffer.from(process.env.ENCRYPTION_IV, "hex")
-	);
-	let decrypted = "";
-	try {
-		decrypted = decipher.update(authCode, "hex", "utf8");
-		decrypted += decipher.final("utf8");
-	} catch (error) {
-		console.error("Decryption error");
-		return res.status(400).json({ error: "Invalid auth code" });
-	}
-	const email = decrypted.split(" ")[0];
-	if (!email) {
+	const email = getEmailFromAuthCode(authCode);
+	if (!email || email === "Invalid auth code") {
 		return res.status(400).json({ error: "Invalid auth code" });
 	}
 
@@ -178,10 +155,122 @@ export const verifyAuthCode = async (req, res) => {
 	}
 };
 
+export const resetPassword = async (req, res) => {
+	const { authCode, password } = req.body;
+
+	const email = getEmailFromAuthCode(authCode);
+	if (!email || email === "Invalid auth code") {
+		return res.status(400).json({ error: "Invalid auth code" });
+	}
+
+	try {
+		const user = await findByEmail(email);
+		if (user) {
+			if (Date.now() - user.authCodeCreatedAt > 1 * 60 * 1000) {
+				return res.status(400).json({
+					error: "Auth code expired",
+				});
+			}
+			if (user.authCode === authCode) {
+				const salt = await bcrypt.genSalt(
+					parseInt(process.env.SALT_WORK_FACTOR)
+				);
+				user.password = await bcrypt.hash(password, salt);
+				await user.save();
+				return res
+					.status(200)
+					.json({ message: "Password Reset Successfully" });
+			} else {
+				return res.status(401).json({ error: "Invalid auth code" });
+			}
+		} else {
+			return res.status(401).json({ error: "Invalid auth code" });
+		}
+	} catch (error) {
+		res.status(500).json({ error: "Internal server error" });
+		console.log("Verification error:", error);
+	}
+};
+
+export const requestPasswordReset = async (req, res) => {
+	const { email } = req.body;
+	const transporter = nodemailer.createTransport({
+		host: process.env.EMAIL_SMTP_HOST,
+		port: process.env.EMAIL_SMTP_PORT,
+		secure: false, // true for 465, false for other ports
+		auth: {
+			user: process.env.EMAIL_USER, // your email address
+			pass: process.env.EMAIL_PASS, // your email password
+		},
+	});
+
+	try {
+		const user = await findByEmail(email);
+		if (!user) {
+			return res.status(404).json({ error: "Email not registered." });
+		}
+		let authCode = user.authCode;
+		if (Date.now() - user.authCodeCreatedAt > 1 * 60 * 1000) {
+			authCode = getAuthCode(email);
+			user.authCode = authCode;
+			user.authCodeCreatedAt = Date.now();
+		}
+		await user.save();
+
+		await transporter.sendMail({
+			from: `"${process.env.EMAIL_NAME}" <${process.env.EMAIL_USER}>`, // sender address
+			to: email,
+			subject: "ConceptAI Password Reset",
+			text: `Hi ${user.name}! You have requested a password reset for ConceptAI.`,
+			html: `<b><p>Hi ${user.name}!</p></b><p>You have requested a password reset for ConceptAI.</p><Click on the link below to reset your password:</p><p><a href="${process.env.FRONTEND_URL}/reset-password?code=${authCode}">Reset Password</a></p>`,
+		});
+
+		res.status(200).json({
+			success: true,
+			message: "Password reset request successful",
+		});
+	} catch (error) {
+		console.error("Password reset request error:", error);
+		res.status(500).json({ error: "Internal server error" });
+	}
+};
+
 async function findByEmail(plainEmail) {
 	const hashedEmail = crypto
 		.createHmac("sha256", process.env.EMAIL_HASH_SECRET)
 		.update(plainEmail)
 		.digest("hex");
 	return User.findOne({ email: hashedEmail });
+}
+
+function getAuthCode(email) {
+	const cipher = crypto.createCipheriv(
+		process.env.ENCRYPTION_ALGORITHM,
+		Buffer.from(process.env.ENCRYPTION_KEY, "hex"),
+		Buffer.from(process.env.ENCRYPTION_IV, "hex")
+	);
+	let encrypted = cipher.update(
+		email + " " + randomBytes(16).toString("hex"),
+		"utf8",
+		"hex"
+	);
+	encrypted += cipher.final("hex");
+	return encrypted;
+}
+
+function getEmailFromAuthCode(authCode) {
+	const decipher = crypto.createDecipheriv(
+		process.env.ENCRYPTION_ALGORITHM,
+		Buffer.from(process.env.ENCRYPTION_KEY, "hex"),
+		Buffer.from(process.env.ENCRYPTION_IV, "hex")
+	);
+	let decrypted = "";
+	try {
+		decrypted = decipher.update(authCode, "hex", "utf8");
+		decrypted += decipher.final("utf8");
+	} catch (error) {
+		console.error("Decryption error");
+		return "Invalid auth code";
+	}
+	return decrypted.split(" ")[0];
 }

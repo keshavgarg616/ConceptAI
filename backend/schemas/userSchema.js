@@ -6,8 +6,8 @@ import crypto from "crypto";
 
 dotenv.config();
 
-const SALT_WORK_FACTOR = parseInt(process.env.SALT_WORK_FACTOR || "10");
-const EMAIL_HASH_SECRET = process.env.EMAIL_HASH_SECRET || "default";
+const SALT_WORK_FACTOR = parseInt(process.env.SALT_WORK_FACTOR);
+const EMAIL_HASH_SECRET = process.env.EMAIL_HASH_SECRET;
 
 // Helper to hash emails with HMAC SHA256
 function hashEmail(email) {

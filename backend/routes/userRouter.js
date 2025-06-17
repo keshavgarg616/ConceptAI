@@ -3,7 +3,9 @@ import {
 	chat,
 	login,
 	signUp,
-	verifyAuthCode,
+	verifyEmailCode,
+	resetPassword,
+	requestPasswordReset,
 } from "../controllers/userController.js";
 import verifyToken from "../middleware.js";
 const userRouter = Router();
@@ -11,6 +13,8 @@ const userRouter = Router();
 userRouter.post("/signup", signUp);
 userRouter.post("/login", login);
 userRouter.post("/chat", verifyToken, chat);
-userRouter.post("/verify-authcode", verifyAuthCode);
+userRouter.post("/verify-email-code", verifyEmailCode);
+userRouter.post("/reset-password", resetPassword);
+userRouter.post("/request-password-reset", requestPasswordReset);
 
 export default userRouter;
