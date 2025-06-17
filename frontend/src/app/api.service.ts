@@ -88,13 +88,11 @@ export class ApiService {
 			this.getAuthHeaders()
 		);
 	}
-}
 
-// Routes available at /chat, /signup, /login, /update-language, /get-languages, /update-history, /get-history
-// /chat (message, history) -> { reply: "response text" } --
-// /signup (name, email, password) -> { success: true, message: "User created successfully" } --
-// /login (email, password) -> { success: true, message: "Login successful", user: { name, email, history } } --
-// /update-language (languages) -> { success: true, message: "Languages updated successfully" }
-// /get-languages () -> { languages: [{ languageName, concepts: [{ conceptName, history }] }] }
-// /update-history (languageName, conceptName, history) -> { success: true, message: "History updated successfully" }
-// /get-history (languageName, conceptName) -> { history: [{ role, parts }] }
+	verifyEmail(email: string, authCode: string): Observable<any> {
+		return this.http.post(`${this.apiUrl}/verify-authcode`, {
+			email,
+			authCode,
+		});
+	}
+}

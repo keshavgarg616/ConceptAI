@@ -3,6 +3,7 @@ import { LoginComponent } from "./routes/loginComponent";
 import { ChatComponent } from "./routes/chatComponent";
 import { LogoutComponent } from "./routes/logoutComponent";
 import { SignUpComponent } from "./routes/signUpComponent";
+import { emailVerificationComponent } from "./routes/emailVerificationComponent";
 import { authGuard } from "./auth-guard";
 import { LanguagesComponent } from "./routes/LanguagesComponent";
 
@@ -17,5 +18,6 @@ export const routes: Routes = [
 		component: LanguagesComponent,
 		canActivate: [authGuard],
 	},
+	{ path: "verify-email", component: emailVerificationComponent },
 	{ path: "**", redirectTo: "login" },
 ];

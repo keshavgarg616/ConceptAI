@@ -4,7 +4,9 @@ import User from "../schemas/userSchema.js";
 import Languages from "../schemas/languagesSchema.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import { randomBytes } from "crypto";
 import crypto from "crypto";
+import nodemailer from "nodemailer";
 
 dotenv.config();
 const genAI = new GoogleGenAI({ apiKey: process.env.GENAI_API_KEY });
@@ -32,6 +34,16 @@ export const chat = async (req, res) => {
 
 export const signUp = async (req, res) => {
 	const { name, email, password } = req.body;
+	const transporter = nodemailer.createTransport({
+		host: process.env.EMAIL_SMTP_HOST,
+		port: process.env.EMAIL_SMTP_PORT,
+		secure: false, // true for 465, false for other ports
+		auth: {
+			user: process.env.EMAIL_USER, // your email address
+			pass: process.env.EMAIL_PASS, // your email password
+		},
+	});
+	const authCode = randomBytes(8).toString("hex");
 
 	try {
 		const existingUser = await findByEmail(email);
@@ -39,11 +51,26 @@ export const signUp = async (req, res) => {
 			return res.status(409).json({ error: "User already exists" });
 		}
 
-		const newUser = new User({ name, email, password });
+		const newUser = new User({
+			name,
+			email,
+			password,
+			authCode,
+			isVerified: false,
+		});
 		const userLanguages = new Languages({
 			foreign_id: newUser._id,
 			languages: [],
 		});
+		(async () => {
+			const info = await transporter.sendMail({
+				from: `"${process.env.EMAIL_NAME}" <${process.env.EMAIL_USER}>`, // sender address
+				to: email,
+				subject: "ConceptAI Sign Up",
+				text: `Hi ${name}! You have signed up for ConceptAI!`,
+				html: `<b><p>Hi ${name}!</p></b><p>You have signed up for ConceptAI!</p><Click on the link below to verify your email address:</p><p><a href="${process.env.FRONTEND_URL}/verify-email?code=${authCode}">Verify Email</a></p>`,
+			});
+		})();
 		await userLanguages.save();
 		await newUser.save();
 
@@ -62,8 +89,16 @@ export const login = async (req, res) => {
 	try {
 		const user = await findByEmail(email);
 		if (user) {
-			const isPasswordValid = bcrypt.compare(password, user.password);
+			const isPasswordValid = await bcrypt.compare(
+				password,
+				user.password
+			);
 			if (isPasswordValid) {
+				if (!user.isVerified) {
+					return res
+						.status(403)
+						.json({ error: "Email not verified" });
+				}
 				const token = jwt.sign(
 					{ userId: user._id },
 					process.env.JWT_SECRET,
@@ -81,6 +116,34 @@ export const login = async (req, res) => {
 	} catch (error) {
 		console.error("Login error:", error);
 		res.status(500).json({ error: "Internal server error" });
+	}
+};
+
+export const verifyAuthCode = async (req, res) => {
+	const { email, authCode } = req.body;
+	try {
+		const user = await findByEmail(email);
+		if (user) {
+			if (user.isVerified) {
+				return res
+					.status(400)
+					.json({ error: "Email already verified" });
+			}
+			if (user.authCode === authCode) {
+				user.isVerified = true;
+				await user.save();
+				return res
+					.status(200)
+					.json({ message: "Email verified successfully" });
+			} else {
+				return res.status(401).json({ error: "Invalid auth code" });
+			}
+		} else {
+			return res.status(401).json({ error: "User not found" });
+		}
+	} catch (error) {
+		res.status(500).json({ error: "Internal server error" });
+		console.log("Verification error:", error);
 	}
 };
 

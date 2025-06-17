@@ -47,6 +47,12 @@ export class LoginComponent {
 						this.invalidInfo.push("User not found");
 					} else if (error.error.error.includes("Invalid password")) {
 						this.invalidInfo.push("Invalid password");
+					} else if (
+						error.error.error.includes("Email not verified")
+					) {
+						this.invalidInfo.push(
+							"Email not verified. Please verify your email."
+						);
 					}
 				},
 			});

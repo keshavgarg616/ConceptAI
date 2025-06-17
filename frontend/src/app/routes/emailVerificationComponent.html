@@ -1,0 +1,40 @@
+<div *ngIf="emailVerified" style="
+        color: greenyellow;
+        font-weight: bold;
+        background-color: green;
+        border-radius: 5px;
+        padding: 10px;
+        width: 800px;
+        margin: 0 auto;
+        text-align: center;
+    ">
+    Email verified successfully!
+    <br>
+</div>
+<form [formGroup]="emailForm" (ngSubmit)="verify()" style="text-align: center;">
+    <div *ngIf="invalidInfo.length > 0">
+        <ul style="
+        list-style-type: none;
+        color: red;
+        font-weight: bold;
+        background-color: #f8d7da;
+        border-radius: 5px;
+        padding: 10px;
+        width: 800px;
+        margin: 0 auto;
+        text-align: center;
+    ">
+            <div *ngFor="let message of invalidInfo">
+                <li>{{ message }}</li>
+            </div>
+        </ul>
+        <br>
+    </div>
+    <h2>Verify Email</h2>
+    <mat-form-field appearance="fill" class="w-full" style="width: 600px;">
+        <mat-label>Email</mat-label>
+        <input type="text" formControlName="email" matInput required />
+    </mat-form-field><br>
+    <button type="submit" mat-raised-button color="primary" [disabled]="emailForm.invalid" style="">Verify
+        Email</button>
+</form>

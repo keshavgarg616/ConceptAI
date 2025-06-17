@@ -17,6 +17,7 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatOptionModule } from "@angular/material/core";
 import { ApiService } from "../api.service";
 import { Router } from "@angular/router";
+import { debounceTime } from "rxjs";
 
 @Component({
 	selector: "languages-route",
@@ -36,6 +37,8 @@ import { Router } from "@angular/router";
 export class LanguagesComponent {
 	languagesForm: FormGroup;
 	router: Router;
+	changesSaved: boolean = false;
+	languagesFetched: boolean = false;
 
 	constructor(private fb: FormBuilder, private apiService: ApiService) {
 		this.router = inject(Router);
@@ -58,6 +61,15 @@ export class LanguagesComponent {
 				console.error("Error fetching languages:", error);
 			},
 		});
+		this.languagesForm.valueChanges
+			.pipe(debounceTime(1500))
+			.subscribe(() => {
+				if (this.languagesFetched) {
+					this.onSubmit();
+				} else {
+					this.languagesFetched = true;
+				}
+			});
 	}
 
 	newLanguage(languageData?: any): FormGroup {
@@ -127,6 +139,10 @@ export class LanguagesComponent {
 						console.error("Error updating languages:", error);
 					},
 				});
+			this.changesSaved = true;
+			new Promise((r) => setTimeout(r, 1500)).then(() => {
+				this.changesSaved = false;
+			});
 		}
 	}
 

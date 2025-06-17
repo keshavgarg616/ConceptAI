@@ -32,6 +32,14 @@ const userSchema = new mongoose.Schema({
 		required: true,
 		minlength: 8,
 	},
+	authCode: {
+		type: String,
+		required: true, // used for email verification
+	},
+	isVerified: {
+		type: Boolean,
+		default: false, // indicates if the email is verified
+	},
 });
 
 // Pre-save hook for password + email hashing

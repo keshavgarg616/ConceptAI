@@ -46,8 +46,12 @@ export class ChatComponent {
 			languageName: string;
 			conceptName: string;
 		};
-		this.languageName = state.languageName;
-		this.conceptName = state.conceptName;
+		if (state === null || state === undefined) {
+			this.router.navigate(["/languages"]);
+			return;
+		}
+		this.languageName = state.languageName ?? "";
+		this.conceptName = state.conceptName ?? "";
 		if (!this.languageName || !this.conceptName) {
 			this.router.navigate(["/languages"]);
 			return;
