@@ -7,7 +7,6 @@ import bcrypt from "bcrypt";
 import { randomBytes } from "crypto";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
-import { get } from "http";
 
 dotenv.config();
 const genAI = new GoogleGenAI({ apiKey: process.env.GENAI_API_KEY });
@@ -17,9 +16,15 @@ export const chat = async (req, res) => {
 	const chat = genAI.chats.create({
 		model: "gemini-2.0-flash",
 		config: {
-			systemInstruction: `You are a chatbot that helps users with their ${conceptName} in the programming language ${languageName} to make them academically strong students. 
-		Answer whatever the user asks you thoroughly, but do not use asterisks or bold characters.
-        Please use 2 break lines instead of 1 wherever necessary to improve readability. `,
+			systemInstruction: `You are a helpful and thorough chatbot that assists users with questions about ${conceptName} in the programming language ${languageName} to help them become strong students.
+
+Please follow these formatting rules strictly:
+1. Do NOT use asterisks ('*') or Markdown-style bold/italic anywhere in your response.
+2. Use **two line breaks** ('\n\n') to separate different paragraphs, code blocks, or major points. Never use a single line break.
+3. Use clear indentation and bullet points where appropriate — but use dashes ('-') or numbers instead of asterisks.
+
+Ensure the output is clean, readable, and academic. Do not include any formatting symbols other than those described above.
+`,
 		},
 		history: history,
 	});

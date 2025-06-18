@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { Component, inject } from "@angular/core";
+import { Component, ElementRef, inject, ViewChild } from "@angular/core";
 import {
 	FormControl,
 	FormGroup,
@@ -12,6 +12,7 @@ import { MatFormFieldModule, MatLabel } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
 import { ApiService } from "../api.service";
 import { Router } from "@angular/router";
+import { NewLineHTMLPipe } from "../pipes/new-line-html-pipe";
 
 @Component({
 	selector: "chat-route",
@@ -26,15 +27,18 @@ import { Router } from "@angular/router";
 		MatLabel,
 		MatButtonModule,
 		ReactiveFormsModule,
+		NewLineHTMLPipe,
 	],
 })
 export class ChatComponent {
+	@ViewChild("scrollMe") private scrollMe!: ElementRef;
 	router: Router;
 	history: { role: string; parts: { text: string }[] }[] = [];
 	historyDeleted: boolean = false;
 	loadingResponse: boolean = false;
 	languageName: string = "";
 	conceptName: string = "";
+	queryText: string = "";
 	chatForm = new FormGroup({
 		query: new FormControl("", Validators.required),
 	});
@@ -65,6 +69,11 @@ export class ChatComponent {
 						console.error("Error fetching history");
 					} else {
 						this.history = response.history || [];
+						new Promise((r) => setTimeout(r, 500)).then(() => {
+							this.scrollMe?.nativeElement.scrollIntoView({
+								behavior: "smooth",
+							});
+						});
 					}
 				},
 			});
@@ -101,6 +110,12 @@ export class ChatComponent {
 						.subscribe({
 							next: (updateResponse) => {},
 						});
+					new Promise((r) => setTimeout(r, 250)).then(() => {
+						this.scrollMe?.nativeElement.scrollIntoView({
+							behavior: "smooth",
+						});
+					});
+					console.log(this.history[this.history.length - 1]);
 				},
 			});
 	}
