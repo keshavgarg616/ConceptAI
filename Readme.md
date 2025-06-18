@@ -2,7 +2,7 @@
 
 **ConceptAI** is an AI-powered chatbot web app that helps users learn and organize programming concepts across various languages. With an Angular frontend and Node.js + Express backend, ConceptAI integrates Google's Gemini API to deliver individualized, context-aware assistance on each concept you add.
 
-Whether you're learning Python, JavaScript, Java, or any other language, ConceptAI provides a structured space to define concepts and receive smart, AI-generated guidance — like having a personal tutor for every coding idea.
+Whether you're learning Python, JavaScript, Java, or any other language, ConceptAI provides a structured space to define concepts and receive smart, AI-generated guidance, like having a personal tutor for every coding idea.
 
 ---
 
@@ -34,9 +34,9 @@ ConceptAI/
 ├── frontend/             # Angular application
 │   └── src/
 │       ├── environments
-│           └── environment.ts
+│       │   └── environment.ts
 │       └── app/
-|			├── pipes/
+|           ├── pipes/
 │           └── routes/
 ├── backend/              # Node.js + Express server
 │   ├── controllers/
