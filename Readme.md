@@ -36,6 +36,7 @@ ConceptAI/
 │       ├── environments
 │           └── environment.ts
 │       └── app/
+|			├── pipes/
 │           └── routes/
 ├── backend/              # Node.js + Express server
 │   ├── controllers/
